@@ -1,5 +1,6 @@
 const axios = require('axios');
 const _ = require('lodash');
+const querystring = require('querystring');
 const config = require('../config');
 
 if (!config.api_key) {
@@ -11,10 +12,15 @@ axios.defaults.headers.common = {
   'Ocp-Apim-Subscription-Key': config.api_key
 };
 
+const parseQueryString = (str, returnKey) => {
+  const parsed = querystring.parse(str);
+  return parsed[returnKey];
+}
+
 const transformResponse = (response) => {
   return _.map(_.get(response, 'data.value'), item => ({
-    context: item.hostPageUrl,
-    url: item.contentUrl,
+    context: parseQueryString(item.hostPageUrl, 'r'),
+    url: parseQueryString(item.contentUrl, 'r'),
     alt: item.name
   }));
 };
